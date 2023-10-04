@@ -41,6 +41,10 @@ class Spot(db.Model):
             "createdAt": self.created_at,
             "updatedAt": self.updated_at,
             "avgRating": sum([review.rating for review in self.reviews])
-            / len(self.reviews),
-            "previewImage": [image.url for image in self.images if image.preview][0],
+            / len(self.reviews)
+            if len(self.reviews)
+            else 1,
+            "previewImage": [image.url for image in self.images if image.preview][0]
+            if len(self.images)
+            else None,
         }
