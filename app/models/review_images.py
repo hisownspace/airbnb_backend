@@ -13,3 +13,9 @@ class ReviewImage(db.Model):
 
     # Relationships
     review = db.relationship("Review", back_populates="images")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "url": self.url,
+        }

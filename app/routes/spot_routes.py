@@ -1,8 +1,8 @@
 from flask import Blueprint, request
 from flask_login import login_required, logout_user, current_user
 
-from ..forms import SpotForm, ImageForm
-from ..models import db, Spot, SpotImage
+from ..forms import SpotForm, ImageForm, ReviewForm
+from ..models import db, Spot, SpotImage, Review
 
 spot_routes = Blueprint("spot_routes", __name__, url_prefix="/api/spots")
 
@@ -112,3 +112,37 @@ def add_image_to_spot(spot_id):
         db.session.commit()
         return new_image.to_dict(), 200
     return {"message": "Invalid request", "errors": form.errors}, 401
+
+
+@spot_routes.route("/<int:spot_id>/reviews")
+def get_all_spot_reviews(spot_id):
+    spot = Spot.query.get(spot_id)
+    if not spot:
+        return {"message": "Spot couldn't be found"}, 404
+    else:
+        return {"Reviews": [review.to_Dict() for review in spot.reviews]}, 200
+    spot = Spot.query.get(spot_id)
+    if not spot:
+        return {"message": "Spot couldn't be found"}, 404
+    else:
+        return {"Reviews": [review.to_Dict() for review in spot.reviews]}, 200
+
+
+@spot_routes.route("/<int:spot_id>/reviews", methods=["POST"])
+def create_review(spot_id):
+    form = ReviewForm()
+
+    form["csrf_token"].data = request.cookies["csrf_token"]
+
+    if form.validate_on_submit():
+        spot = Spot.query.get(spot_id)
+        if not spot:
+            return {"message": "Spot couldn't be found"}, 404
+        data = {"review": form.data["review"], "stars": form.data["stars"]}
+        new_review = Review(**data)
+        new_review.reviewer = current_user
+        new_review.spot = spot
+        db.session.add(new_review)
+        db.session.commit()
+        return new_review.to_dict(new_review=True), 201
+    return {"message": "Bad Request", "errors": form.errors}, 400

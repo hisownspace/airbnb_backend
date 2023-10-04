@@ -33,7 +33,13 @@ class User(db.Model, UserMixin):
     def check_password(self, val):
         return check_password_hash(self.password, val)
 
-    def to_dict(self):
+    def to_dict(self, from_review=False):
+        if from_review:
+            return {
+                "id": self.id,
+                "firstName": self.first_name,
+                "lastName": self.last_name,
+            }
         return {
             "id": self.id,
             "firstName": self.first_name,
