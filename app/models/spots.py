@@ -21,16 +21,18 @@ class Spot(db.Model):
 
     # Relationships
     owner = db.relationship("User", back_populates="spots")
-    images = db.relationship("SpotImage", back_populates="spot")
+    images = db.relationship(
+        "SpotImage", back_populates="spot", cascade="all, delete-orphan"
+    )
     bookings = db.relationship("Booking", back_populates="spot")
     reviews = db.relationship("Review", back_populates="spot")
 
-    def to_dict(self):
-        return {
+    def to_dict(self, single=False):
+        spot_dict = {
             "id": self.id,
             "ownerId": self.owner_id,
             "address": self.address,
-            "city": self.address,
+            "city": self.city,
             "state": self.state,
             "country": self.country,
             "lat": self.lat,
@@ -48,3 +50,7 @@ class Spot(db.Model):
             if len(self.images)
             else None,
         }
+        if single:
+            spot_dict["SpotImages"] = [image.to_dict() for image in self.images]
+
+        return spot_dict

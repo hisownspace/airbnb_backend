@@ -14,3 +14,10 @@ class SpotImage(db.Model):
 
     # Relationships
     spot = db.relationship("Spot", back_populates="images")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "url": self.url,
+            "preview": self.preview,
+        }

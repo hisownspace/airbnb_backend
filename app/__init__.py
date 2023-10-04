@@ -3,7 +3,7 @@ from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_wtf.csrf import generate_csrf
 from .models import db, User
-from .routes import spot_routes, auth_routes
+from .routes import spot_routes, auth_routes, review_routes
 from .config import Config
 
 app = Flask(__name__)
@@ -19,6 +19,7 @@ login_manager.init_app(app)
 
 app.register_blueprint(spot_routes, url_prefix="/api/spots")
 app.register_blueprint(auth_routes, url_prefix="/api/session")
+app.register_blueprint(review_routes, url_prefix="/api/reviews")
 
 
 @login_manager.user_loader
